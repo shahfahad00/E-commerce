@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}E-Commerce App{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#ea580c',      // Orange-600
+                        'primary-light': '#fb923c', // Orange-400
+                        'primary-dark': '#c2410c',  // Orange-700
+                        secondary: '#f97316',    // Orange-500
+                        accent: '#fed7aa',       // Orange-200
+                        'gray-warm': '#78716c',  // Stone-500
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-up': 'slideUp 0.3s ease-out',
+                        'bounce-soft': 'bounceSoft 0.6s ease-in-out',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 3s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(10px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        bounceSoft: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-5px)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #fed7aa 0%, #fdba74 25%, #fb923c  50%, #f97316 75%, #ea580c 100%);
+        }
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.9);
+        }
+        .hover-glow:hover {
+            box-shadow: 0 0 20px rgba(234, 88, 12, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-orange-50 to-white min-h-screen">
+    <!-- Navigation -->
+    <nav x-data="{ open: false }" class="glass-effect border-b border-orange-100 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="{% url 'catalog:product_list' %}"
+                       class="flex items-center space-x-2 text-xl font-bold text-primary hover:text-primary-dark transition-all duration-300 hover-glow rounded-lg px-3 py-2">
+                        <i data-lucide="shopping-bag" class="w-6 h-6 animate-bounce-soft"></i>
+                        <span class="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">E-Commerce</span>
+                    </a>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="{% url 'catalog:product_list' %}"
+                       class="flex items-center space-x-2 text-gray-warm hover:text-primary transition-all duration-300 font-medium hover:scale-105">
+                        <i data-lucide="grid-3x3" class="w-4 h-4"></i>
+                        <span>Products</span>
+                    </a>
+                    <a href="{% url 'cart:cart_detail' %}"
+                       x-data="{ count: 0 }"
+                       class="relative flex items-center space-x-2 text-gray-warm hover:text-primary transition-all duration-300 font-medium hover:scale-105">
+                        <i data-lucide="shopping-cart" class="w-4 h-4"></i>
+                        <span>Cart</span>
+                        <span x-show="count > 0" x-text="count"
+                              class="absolute -top-2 -right-2 bg-gradient-to-r from-primary to-secondary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse-slow"></span>
+                    </a>
+                    <a href="/admin/"
+                       class="flex items-center space-x-2 bg-gradient-to-r from-primary to-secondary text-white px-4 py-2 rounded-full hover:scale-105 transition-all duration-300 hover-glow shadow-lg">
+                        <i data-lucide="settings" class="w-4 h-4"></i>
+                        <span>Admin</span>
+                    </a>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button @click="open = !open"
+                            class="text-gray-warm hover:text-primary focus:outline-none transition-all duration-300 hover:scale-110 p-2 rounded-lg hover:bg-orange-50">
+                        <i x-show="!open" data-lucide="menu" class="w-6 h-6"></i>
+                        <i x-show="open" data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Navigation -->
+            <div x-show="open"
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 scale-95"
+                 x-transition:enter-end="opacity-100 scale-100"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100 scale-100"
+                 x-transition:leave-end="opacity-0 scale-95"
+                 class="md:hidden">
+                <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-gradient-to-r from-orange-50 to-white rounded-b-lg shadow-lg">
+                    <a href="{% url 'catalog:product_list' %}"
+                       class="flex items-center space-x-3 px-3 py-2 text-gray-warm hover:text-primary hover:bg-orange-100 rounded-lg transition-all duration-300">
+                        <i data-lucide="grid-3x3" class="w-4 h-4"></i>
+                        <span>Products</span>
+                    </a>
+                    <a href="{% url 'cart:cart_detail' %}"
+                       class="flex items-center space-x-3 px-3 py-2 text-gray-warm hover:text-primary hover:bg-orange-100 rounded-lg transition-all duration-300">
+                        <i data-lucide="shopping-cart" class="w-4 h-4"></i>
+                        <span>Cart</span>
+                    </a>
+                    <a href="/admin/"
+                       class="flex items-center space-x-3 px-3 py-2 text-gray-warm hover:text-primary hover:bg-orange-100 rounded-lg transition-all duration-300">
+                        <i data-lucide="settings" class="w-4 h-4"></i>
+                        <span>Admin</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-16 bg-gradient-to-r from-primary-dark via-primary to-secondary text-white relative overflow-hidden">
+        <!-- Background Pattern -->
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute inset-0" style="background-image: radial-gradient(circle at 25% 25%, #ffffff 2px, transparent 2px), radial-gradient(circle at 75% 75%, #ffffff 2px, transparent 2px); background-size: 50px 50px;"></div>
+        </div>
+
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Main Footer Content -->
+            <div class="py-12 grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Brand Section -->
+                <div class="md:col-span-2 space-y-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-white bg-opacity-20 p-2 rounded-lg animate-float">
+                            <i data-lucide="shopping-bag" class="w-8 h-8 text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold">E-Commerce</h3>
+                            <p class="text-orange-100">Your Ultimate Shopping Destination</p>
+                        </div>
+                    </div>
+                    <p class="text-orange-100 max-w-md leading-relaxed">
+                        Discover amazing products with seamless shopping experience. Built with modern technology for the future of e-commerce.
+                    </p>
+                    <!-- Social Links -->
+                    <div class="flex space-x-4 pt-4">
+                        <a href="#" class="bg-white bg-opacity-20 p-2 rounded-lg hover:bg-opacity-30 transition-all duration-300 hover:scale-110 hover-glow">
+                            <i data-lucide="github" class="w-5 h-5"></i>
+                        </a>
+                        <a href="#" class="bg-white bg-opacity-20 p-2 rounded-lg hover:bg-opacity-30 transition-all duration-300 hover:scale-110 hover-glow">
+                            <i data-lucide="linkedin" class="w-5 h-5"></i>
+                        </a>
+                        <a href="#" class="bg-white bg-opacity-20 p-2 rounded-lg hover:bg-opacity-30 transition-all duration-300 hover:scale-110 hover-glow">
+                            <i data-lucide="twitter" class="w-5 h-5"></i>
+                        </a>
+                        <a href="#" class="bg-white bg-opacity-20 p-2 rounded-lg hover:bg-opacity-30 transition-all duration-300 hover:scale-110 hover-glow">
+                            <i data-lucide="instagram" class="w-5 h-5"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="space-y-4">
+                    <h4 class="text-lg font-semibold flex items-center space-x-2">
+                        <i data-lucide="link" class="w-4 h-4"></i>
+                        <span>Quick Links</span>
+                    </h4>
+                    <ul class="space-y-2 text-orange-100">
+                        <li><a href="{% url 'catalog:product_list' %}" class="hover:text-white transition-colors duration-300 hover:translate-x-1 inline-block">Products</a></li>
+                        <li><a href="{% url 'cart:cart_detail' %}" class="hover:text-white transition-colors duration-300 hover:translate-x-1 inline-block">Shopping Cart</a></li>
+                        <li><a href="/admin/" class="hover:text-white transition-colors duration-300 hover:translate-x-1 inline-block">Admin Panel</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors duration-300 hover:translate-x-1 inline-block">Support</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div class="space-y-4">
+                    <h4 class="text-lg font-semibold flex items-center space-x-2">
+                        <i data-lucide="mail" class="w-4 h-4"></i>
+                        <span>Contact</span>
+                    </h4>
+                    <div class="space-y-3 text-orange-100">
+                        <div class="flex items-center space-x-3">
+                            <i data-lucide="mail" class="w-4 h-4 text-orange-200"></i>
+                            <span>hello@ecommerce.com</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i data-lucide="phone" class="w-4 h-4 text-orange-200"></i>
+                            <span>+1 (555) 123-4567</span>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <i data-lucide="map-pin" class="w-4 h-4 text-orange-200 mt-1"></i>
+                            <span>123 Commerce St.<br>Digital City, DC 12345</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Bar -->
+            <div class="border-t border-orange-400 border-opacity-30 py-6">
+                <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                    <div class="flex items-center space-x-4 text-orange-100">
+                        <p>&copy; 2025 E-Commerce. By Usman Ali</p>
+                        <div class="hidden md:flex items-center space-x-1">
+                            <span>•</span>
+                            <span>Built with</span>
+                            <i data-lucide="heart" class="w-4 h-4 text-red-300 animate-pulse-slow"></i>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-6 text-orange-100 text-sm">
+                        <a href="#" class="hover:text-white transition-colors duration-300">Privacy Policy</a>
+                        <a href="#" class="hover:text-white transition-colors duration-300">Terms of Service</a>
+                        <a href="#" class="hover:text-white transition-colors duration-300">Cookies</a>
+                    </div>
+                </div>
+
+                <!-- Tech Stack -->
+                <div class="mt-4 pt-4 border-t border-orange-400 border-opacity-20">
+                    <div class="flex flex-wrap items-center justify-center space-x-6 text-orange-200 text-sm">
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="server" class="w-4 h-4"></i>
+                            <span>Django</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="palette" class="w-4 h-4"></i>
+                            <span>Tailwind CSS</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="zap" class="w-4 h-4"></i>
+                            <span>Alpine.js</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="container" class="w-4 h-4"></i>
+                            <span>Docker</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="cloud" class="w-4 h-4"></i>
+                            <span>Render</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Initialize Lucide Icons -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>
