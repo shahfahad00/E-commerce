@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: django-app
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: DEBUG
+        value: false
+      - key: ALLOWED_HOSTS
+        value: "*"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        value: postgresql://neondb_owner:npg_1bEs0OAhLZeK@ep-rough-bread-ah0r6j7n-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require
+    healthCheckPath: /
